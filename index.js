@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const jwt = require('jsonwebtoken')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
@@ -15,8 +16,7 @@ app.get('/', (req, res) => {
 
 
 
-
-console.log(process.env.DB_PASS);
+// console.log(process.env.DB_PASS);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8ev4byy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -37,7 +37,15 @@ async function run() {
     const serviseCollection = client.db("CarDoctor").collection("services");
     const bookingCollection = client.db("CarDoctor").collection("bookings");
 
+    // auth related api
+    app.post('/jwt', async(req, res) =>{
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'})
+      res.send(token)
+    })
 
+
+    // services related api
     app.get('/services', async (req, res) => {
       const cursor = serviseCollection.find();
       const result = await cursor.toArray();
