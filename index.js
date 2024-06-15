@@ -33,19 +33,27 @@ const client = new MongoClient(uri, {
   }
 });
 
-// middleware
+// middleware *******************************
+// middleware *******************************
+// just for idea, no need
 const logger = async (req, res, next) => {
   console.log('called:', req.host, req.originalUrl);
   next()
 }
 
-const verifyToken = async (req, res, next) => {
+const verifyToken = async(req, res, next) =>{
   const token = req.cookies?.token;
-  console.log('value of token in middleware:', token);
-  if (!token) {
-    return res.status(401).send({ message: 'not authorized!' })
+  if(!token){
+    return res.status(401).send({message: 'unauthorized access'})
   }
-  next()
+  
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) =>{
+    if(err) {
+      return res.status(401).send({message: 'unauthorized'})
+    }
+    req.user = decoded;
+    next()
+  })
 }
 
 
@@ -111,6 +119,12 @@ async function run() {
     app.get('/bookings', logger, verifyToken, async (req, res) => {
       // console.log('token token', req.cookies.token);
       // console.log(req.query.email);
+      // console.log('user in the valid token', req.user);
+
+      if(req.query.email !== req.user.email){
+        return res.status(403).send({message: 'Forbidden access'})
+      }
+
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email }
@@ -118,6 +132,7 @@ async function run() {
       const result = await bookingCollection.find(query).toArray();
       res.send(result)
     })
+
 
     app.delete('/bookings/:id', async (req, res) => {
       const id = req.params.id;
