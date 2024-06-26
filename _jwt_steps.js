@@ -1,10 +1,9 @@
-/***
- * insstall jsonwebtoken
- * jwt.sign(playlod, secret, {expiresIn:})
- * token client
+/*****
+
+    
  * 
  * 
- */
+ ****/
 
 
 /***
@@ -17,15 +16,18 @@
  */
 
 /**
- * 1. set cookies with http only. for development secure: false, 
- * 
- * 2. cors
- * app.use(cors({
-  origin: ['http://localhost:5173'],
-  credentials: true
-}));
- * 
- * 3. client side axios setting
- * in axios set withCedentials: true;
+1. jwt --> json web token
+2. generate a token by using jwt.sign
+3. create api set to cookie. http only, secure, same|Site
+4. from client side: axios withCredentials true.
+5. cors setup origin and credentials: true
  * 
  */
+
+/*
+1. for secure api calls
+2. server side: install cookie parser and use it as a middleware
+3. req.cookies
+4. on the client side: make api call using axios withCredentials: true pr credentials include while fetch
+5. 
+*/
